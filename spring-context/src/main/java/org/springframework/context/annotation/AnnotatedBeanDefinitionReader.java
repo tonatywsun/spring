@@ -85,6 +85,9 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+		/*
+			这里会往beanDefinitionMap中塞入一些初始值
+		 */
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
@@ -213,22 +216,36 @@ public class AnnotatedBeanDefinitionReader {
 	 */
 	<T> void doRegisterBean(Class<T> beanClass, @Nullable Supplier<T> instanceSupplier, @Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers, BeanDefinitionCustomizer... definitionCustomizers) {
-		//创建一个BeanDefinition,BeanDefinition是定义一个bean的对象
+		/*
+			创建一个BeanDefinition,BeanDefinition是定义一个bean的对象
+		 */
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
-		//AnnotationMetadata metadata是元数据 封装了一些注解相关信息
+		/*
+			AnnotationMetadata metadata是元数据 封装了一些注解相关信息
+		 */
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
-		//set实例供应者 不知道用处
+		/*
+			set实例供应者 不知道用处
+		 */
 		abd.setInstanceSupplier(instanceSupplier);
-		//处理作用域 单例还是原型
+		/*
+			处理作用域 单例还是原型
+		 */
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
-		//放到BeanDefinition中
+		/*
+			放到BeanDefinition中
+		 */
 		abd.setScope(scopeMetadata.getScopeName());
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
-		//判断有没有加一些常用注解，加的话就set相关值
+		/*
+			判断有没有加一些常用注解，加的话就set相关值
+		 */
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
-		//手动传入qualifiers，由于暂时没传值，先不看
+		/*
+			手动传入qualifiers，由于暂时没传值，先不看
+		 */
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
@@ -242,15 +259,23 @@ public class AnnotatedBeanDefinitionReader {
 				}
 			}
 		}
-		//自定义注解相关
+		/*
+			自定义注解相关
+		 */
 		for (BeanDefinitionCustomizer customizer : definitionCustomizers) {
 			customizer.customize(abd);
 		}
-		//创建一个BeanDefinitionHolder可以理解为把BeanDefinition又扩展了一下的BeanDefinition
+		/*
+			创建一个BeanDefinitionHolder可以理解为把BeanDefinition又扩展了一下的BeanDefinition
+		 */
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
-		//暂时不看
+		/*
+			暂时不看
+		 */
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
-		//重要
+		/*
+			重要,把当前类注册到beanDefinitionMap中
+		 */
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

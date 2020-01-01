@@ -16,8 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,6 +23,8 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.function.Supplier;
 
 /**
  * Standalone application context, accepting <em>component classes</em> as input &mdash;
@@ -63,7 +63,27 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		/*
+			这里初始化一个AnnotationConfigApplicationContext的父类
+			GenericApplicationContext中的beanFactory=new DefaultListableBeanFactory();
+
+			GenericApplicationContext的父类AbstractAutowireCapableBeanFactory的构造方法中会执行
+			ignoreDependencyInterface(BeanNameAware.class);
+			ignoreDependencyInterface(BeanFactoryAware.class);
+			ignoreDependencyInterface(BeanClassLoaderAware.class);
+			就是将BeanNameAware.class、BeanFactoryAware.class、BeanClassLoaderAware.class放入到下Set中
+			private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
+		 */
+		super();
+		/*
+			reader读取一个加了注解的类中的信息封装为BeanDefinition(AnnotatedBeanDefinition)
+			会往beanDefinitionMap中塞入一些初始值
+			注意：Map<String, BeanDefinition> beanDefinitionMap这里塞入的只是BeanDefinition对象而不是bean对象
+		 */
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		/*
+			scanner能够扫描一些类转换成BeanDefinition
+		 */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 

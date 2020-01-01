@@ -1,7 +1,9 @@
 package com.yang;
 
 import com.yang.conf.YangAnnotationConfig;
+import com.yang.conf.processor.MyAddBeanFactoryPostProcessorBeanFactoryPostProcessor;
 import com.yang.service.UserService;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -14,9 +16,11 @@ public class Application {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
 		applicationContext.register(YangAnnotationConfig.class);
-		//applicationContext.addBeanFactoryPostProcessor();
+		BeanFactoryPostProcessor beanFactoryPostProcessor = new MyAddBeanFactoryPostProcessorBeanFactoryPostProcessor();
+		applicationContext.addBeanFactoryPostProcessor(beanFactoryPostProcessor);
 		applicationContext.refresh();
-		UserService userService = (UserService) applicationContext.getBean("userServiceImpl");
-		userService.getUser(1);
+		UserService userService = (UserService) applicationContext.getBean("userService");
+		UserService userService1 = (UserService) applicationContext.getBean("userService");
+		System.out.println(userService.equals(userService1));
 	}
 }
