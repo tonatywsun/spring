@@ -454,11 +454,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public String[] getBeanDefinitionNames() {
+		/*
+			frozenBeanDefinitionNames缓存的bean定义名数组，以防冻结配置
+		 */
 		String[] frozenNames = this.frozenBeanDefinitionNames;
 		if (frozenNames != null) {
 			return frozenNames.clone();
 		}
 		else {
+			/*
+				返回beanDefinitionNames
+			 */
 			return StringUtils.toStringArray(this.beanDefinitionNames);
 		}
 	}
