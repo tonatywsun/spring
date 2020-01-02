@@ -50,7 +50,14 @@ final class PostProcessorRegistrationDelegate {
 
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+			/*
+				BeanFactoryPostProcessor集合
+				regularPostProcessors和registryProcessors都是getBeanFactoryPostProcessors()拿到环境中我们自己添加的
+			 */
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+			/*
+				BeanDefinitionRegistryPostProcessor集合
+			 */
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
@@ -62,7 +69,8 @@ final class PostProcessorRegistrationDelegate {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
 					/*
-						BeanDefinitionRegistryPostProcessor比起父类BeanFactoryPostProcessor多了一个postProcessBeanDefinitionRegistry方法在此执行
+						BeanDefinitionRegistryPostProcessor比起父类BeanFactoryPostProcessor多了一个postProcessBeanDefinitionRegistry方法就是在此执行的
+						DefaultListableBeanFactory实现了BeanDefinitionRegistry所以这里传过去的BeanDefinitionRegistry registry其实就是DefaultListableBeanFactory
 						此处是一个扩展点
 					 */
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
@@ -77,19 +85,52 @@ final class PostProcessorRegistrationDelegate {
 			// uninitialized to let the bean factory post-processors apply to them!
 			// Separate between BeanDefinitionRegistryPostProcessors that implement
 			// PriorityOrdered, Ordered, and the rest.
+			/*
+				系统中当前已经有的
+				存放spring内部的BeanDefinitionRegistryPostProcessor,spring容器自己放进去的
+			 */
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
+			/*
+				通过Class<?> type拿到beanFactory中的Map<String, BeanDefinition> beanDefinitionMap中的key
+				初始化reade时放进去的beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
+
+				当初为什么放进去呢？就是为了在这里得到拿出来使用
+			 */
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
+				/*
+					校验类型是否匹配
+					ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,PriorityOrdered所以是匹配的
+				 */
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+					/*
+						beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class)
+						beanFactory中拿到对象放到currentRegistryProcessors中，
+						beanFactory的map中只有BeanDefinition没有bean对象，所以这里
+						实际是通过Constructor<T> ctor中ctor.newInstance(null)获取到的对象
+					 */
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
 				}
 			}
+			/*
+				排序，按顺序执行，这里排序不重要，而且只有一个不深究了
+				初始化环境中的reader时放入
+				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
+			 */
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			/*
+				和我们自己定义的合并
+			 */
 			registryProcessors.addAll(currentRegistryProcessors);
+			/*
+				循环调用postProcessBeanDefinitionRegistry，注意这里执行的只是currentRegistryProcessors
+				这里执行的是ConfigurationClassPostProcessor中的postProcessBeanDefinitionRegistry
+				那这个方法能做些什么呢？
+			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -255,6 +296,10 @@ final class PostProcessorRegistrationDelegate {
 	private static void sortPostProcessors(List<?> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 		Comparator<Object> comparatorToUse = null;
 		if (beanFactory instanceof DefaultListableBeanFactory) {
+			/*
+				初始化环境中的reader时放入
+				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
+			 */
 			comparatorToUse = ((DefaultListableBeanFactory) beanFactory).getDependencyComparator();
 		}
 		if (comparatorToUse == null) {
@@ -268,7 +313,9 @@ final class PostProcessorRegistrationDelegate {
 	 */
 	private static void invokeBeanDefinitionRegistryPostProcessors(
 			Collection<? extends BeanDefinitionRegistryPostProcessor> postProcessors, BeanDefinitionRegistry registry) {
-
+		/*
+			循环调用postProcessBeanDefinitionRegistry
+		 */
 		for (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) {
 			postProcessor.postProcessBeanDefinitionRegistry(registry);
 		}
