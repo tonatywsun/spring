@@ -221,7 +221,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
 		this.registriesPostProcessed.add(registryId);
-
+		/*
+			主要看这个方法
+		 */
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -324,6 +326,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
+			/**
+				解析candidates(configCandidates-加了@Configuration等注解的BeanDefinitionHolder对象集合)
+			 */
 			parser.parse(candidates);
 			parser.validate();
 

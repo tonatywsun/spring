@@ -16,9 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -34,6 +31,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A bean definition scanner that detects bean candidates on the classpath,
@@ -272,22 +272,63 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
+			/*
+				查询加了@Components注解的集合并把他们转化为BeanDefinition类型
+				加了@Service、@Controller等会不会被解析待测试
+				会被解析的，@Service、@Controller等注解就加了@Components注解，可以认为是他的子类
+			 */
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
+				/*
+					解析scope属性
+				 */
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+				/*
+					生成beanName
+				 */
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+				/*
+					如果这个类的BeanDefinition是AbstractBeanDefinition的子类为他设置一些默认值
+				 */
 				if (candidate instanceof AbstractBeanDefinition) {
+					/*
+						设置以下默认值:
+						setLazyInit(defaults.isLazyInit());
+						setAutowireMode(defaults.getAutowireMode());
+						setDependencyCheck(defaults.getDependencyCheck());
+						setInitMethodName(defaults.getInitMethodName());
+						setEnforceInitMethod(false);
+						setDestroyMethodName(defaults.getDestroyMethodName());
+						setEnforceDestroyMethod(false);
+						setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
+					 */
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				/*
+					如果这个类的BeanDefinition是AnnotatedBeanDefinition的子类，也就是这个类加了注解
+				 */
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					/*
+						处理常用注解的值放到BeanDefinition对象中
+					 */
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+				/*
+					就是判断这个beanName (!)是否在Map<String, BeanDefinition> beanDefinitionMap中
+					!beanDefinitionMap.containsKey(beanName)
+				 */
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+					/*
+						添加到返回集合中去
+					 */
 					beanDefinitions.add(definitionHolder);
+					/*
+						注册到beanDefinitionMap中去
+					 */
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}

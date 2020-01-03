@@ -69,6 +69,7 @@ final class PostProcessorRegistrationDelegate {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
 					/*
+						先执行的是自己手动添加的
 						BeanDefinitionRegistryPostProcessor比起父类BeanFactoryPostProcessor多了一个postProcessBeanDefinitionRegistry方法就是在此执行的
 						DefaultListableBeanFactory实现了BeanDefinitionRegistry所以这里传过去的BeanDefinitionRegistry registry其实就是DefaultListableBeanFactory
 						此处是一个扩展点
@@ -129,7 +130,7 @@ final class PostProcessorRegistrationDelegate {
 			/*
 				循环调用postProcessBeanDefinitionRegistry，注意这里执行的只是currentRegistryProcessors
 				这里执行的是ConfigurationClassPostProcessor中的postProcessBeanDefinitionRegistry
-				那这个方法能做些什么呢？
+				那这个方法能做些什么呢？那就要去看这个类中的postProcessBeanDefinitionRegistry方法了
 			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();

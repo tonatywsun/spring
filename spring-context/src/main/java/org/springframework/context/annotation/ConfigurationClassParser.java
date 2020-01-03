@@ -199,6 +199,9 @@ class ConfigurationClassParser {
 		}
 
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
+		/*
+			处理Imported,暂时不看
+		 */
 		if (existingClass != null) {
 			if (configClass.isImported()) {
 				if (existingClass.isImported()) {
@@ -218,10 +221,16 @@ class ConfigurationClassParser {
 		// Recursively process the configuration class and its superclass hierarchy.
 		SourceClass sourceClass = asSourceClass(configClass);
 		do {
+			/*
+				把相关注解信息封装到configClass中
+				sourceClass用于结束循环
+			 */
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass);
 		}
 		while (sourceClass != null);
-
+		/*
+			放到map中
+		 */
 		this.configurationClasses.put(configClass, configClass);
 	}
 
@@ -246,6 +255,11 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @PropertySource annotations
+		/*
+			@PropertySource处理
+			@PropertySource 用于加载指定的配置文件
+			暂时没用的此注解，暂时不看
+		 */
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
@@ -265,6 +279,9 @@ class ConfigurationClassParser {
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+				/*
+					就是扫描加了注解的类放到map中 注意是BeanDefinition不是bean对象
+				 */
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
@@ -274,6 +291,9 @@ class ConfigurationClassParser {
 						bdCand = holder.getBeanDefinition();
 					}
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, this.metadataReaderFactory)) {
+						/*
+							这里是一个迭代 绕一圈又调回来了
+						 */
 						parse(bdCand.getBeanClassName(), holder.getBeanName());
 					}
 				}
