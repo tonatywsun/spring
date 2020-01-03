@@ -137,12 +137,15 @@ class ConfigurationClassParser {
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, resourceLoader);
 	}
 
-
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
 				if (bd instanceof AnnotatedBeanDefinition) {
+					/*
+						循环扫描所有加了@ComponentScan中的basePackages中的加了注解的类加了@Component以及@Component的子注解的类放到factory的map中
+						处理了一些其他注解相关信息都封装到configClass中然后放到configurationClasses中
+					 */
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
 				else if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
@@ -224,6 +227,10 @@ class ConfigurationClassParser {
 			/*
 				把相关注解信息封装到configClass中
 				sourceClass用于结束循环
+
+				循环扫描所有加了@ComponentScan中的basePackages中的加了注解的类
+				加了@Component以及@Component的子注解的类放到factory的map中
+				处理了一些其他注解相关信息都set到configClass中
 			 */
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass);
 		}
@@ -280,7 +287,7 @@ class ConfigurationClassParser {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
 				/*
-					就是扫描加了注解的类放到map中 注意是BeanDefinition不是bean对象
+					就是扫描加了@Component以及@Component的子注解的类放到map中 注意是BeanDefinition不是bean对象
 				 */
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
@@ -310,6 +317,9 @@ class ConfigurationClassParser {
 			String[] resources = importResource.getStringArray("locations");
 			Class<? extends BeanDefinitionReader> readerClass = importResource.getClass("reader");
 			for (String resource : resources) {
+				/*
+					处理resource中的${}占位符
+				 */
 				String resolvedResource = this.environment.resolveRequiredPlaceholders(resource);
 				configClass.addImportedResource(resolvedResource, readerClass);
 			}

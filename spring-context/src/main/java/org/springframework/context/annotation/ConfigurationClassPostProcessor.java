@@ -328,6 +328,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		do {
 			/**
 				解析candidates(configCandidates-加了@Configuration等注解的BeanDefinitionHolder对象集合)
+
+				 循环扫描所有加了@ComponentScan中的basePackages中的加了注解的类加了@Component以及@Component的子注解的类放到factory的map中
+				 处理了一些其他注解相关信息都封装到configClass中然后放到parser的configurationClasses中
 			 */
 			parser.parse(candidates);
 			parser.validate();
