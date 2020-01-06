@@ -8,5 +8,9 @@ import com.yang.entry.User;
  * @Date: 2020/01/03 18:16
  */
 public interface UserDao {
+	default String test() {
+		return "UserDao test";
+	}
+
 	User getUser(Integer userId);
 }

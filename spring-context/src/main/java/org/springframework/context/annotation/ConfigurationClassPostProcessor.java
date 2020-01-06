@@ -329,10 +329,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			/**
 				解析candidates(configCandidates-加了@Configuration等注解的BeanDefinitionHolder对象集合)
 
-				 循环扫描所有加了@ComponentScan中的basePackages中的加了注解的类加了@Component以及@Component的子注解的类放到factory的map中
-				 处理了一些其他注解相关信息都封装到configClass中然后放到parser的configurationClasses中
+				 循环扫描所有加了@ComponentScan中的basePackages中的加了注解的类加了@Component以及@Component的子注解的类放到factory的map中以及name放到beanDefinitionNames中
+
+				 处理了一些其他注解相关信息都封装成configClass中然后放到parser的Map<ConfigurationClass, ConfigurationClass> configurationClasses中,这里key和value一样是为什么呢？
 			 */
 			parser.parse(candidates);
+			/*
+				校验
+			 */
 			parser.validate();
 
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());

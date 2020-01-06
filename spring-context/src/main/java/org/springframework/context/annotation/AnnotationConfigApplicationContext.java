@@ -177,6 +177,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	@Override
 	public void register(Class<?>... componentClasses) {
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
+		/**
+		 * 就是把这些类注册到beanDefinitionMap中
+		 */
 		this.reader.register(componentClasses);
 	}
 

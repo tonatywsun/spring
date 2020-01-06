@@ -170,11 +170,13 @@ public abstract class AnnotationConfigUtils {
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-			//上面AnnotatedBeanDefinition描述加了注解的类
-			//RootBeanDefinition描述spring内部的类
+			/*
+				上面AnnotatedBeanDefinition描述加了注解的类
+				RootBeanDefinition描述spring内部的类
+			 */
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
-			/*
+			/**
 				registerPostProcessor中调用registry.registerBeanDefinition(beanName, definition);
 				将CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME、def放到beanDefinitionMap中
 			 */
@@ -184,7 +186,7 @@ public abstract class AnnotationConfigUtils {
 		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 			def.setSource(source);
-			/*
+			/**
 				registerPostProcessor中调用registry.registerBeanDefinition(beanName, definition);
 				将AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME、def放到beanDefinitionMap中
 			 */

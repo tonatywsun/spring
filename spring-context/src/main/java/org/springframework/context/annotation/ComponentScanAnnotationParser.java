@@ -131,11 +131,12 @@ class ComponentScanAnnotationParser {
 				return declaringClass.equals(className);
 			}
 		});
-		/*
+		/**
 			这个方法上面set那么多值就是为了调用这个方法
 			这里就开始扫描了
 			扫描basePackages下的所有class是在build\classes下面的class文件不是java文件并过滤出加了@Component以及@Component的子注解的文件转换为BeanDefinition类型
 			生成beanName判断beanName是否在Map<String, BeanDefinition> beanDefinitionMap中不在就放入beanDefinitionMap中并添加到返回集合中
+			这里的scanner是方法中new的不是环境中的
 
 			就是扫描加了注解的类放到map中 注意是BeanDefinition不是bean对象
 		 */

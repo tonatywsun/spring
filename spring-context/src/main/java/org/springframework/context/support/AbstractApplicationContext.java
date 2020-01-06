@@ -486,7 +486,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
-			//初始化环境中的一些值
+			/*
+				初始化环境中的一些值
+			 */
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -509,7 +511,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				/*
+				/**
 					执行所有的BeanFactoryPostProcessors，
 					这里面就是一个扩展点，自己写的BeanFactoryPostProcessors在这里也会被执行从而实现程序员对spring的扩展
 				 */
@@ -637,10 +639,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			set一个bean表达式解析器，为了让工厂能解析bean
 		 */
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
+		/*
+			对象与字符串的转换
+		 */
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
-		/*
+		/**
 			beanFactory中维护了一个List<BeanPostProcessor> beanPostProcessors
 			将new ApplicationContextAwareProcessor(this)添加到此beanPostProcessors中去
 		 */
@@ -665,7 +670,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
 		/*
-			TODO 放入到工厂的Map<Class<?>, Object> resolvableDependencies中，具体作用还未知
+			放入到工厂的Map<Class<?>, Object> resolvableDependencies中
+			依赖的替换，假如你类中注入一个BeanFactory，就把beanFactory传过去
 		 */
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);

@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2019/12/25 10:26
  */
 @Configuration
-public class User {
+public class User extends Peopel{
+	private static final long serialVersionUID = 1L;
 	private Integer userId;
 
 	@Bean

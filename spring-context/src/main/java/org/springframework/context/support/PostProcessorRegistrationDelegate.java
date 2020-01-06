@@ -124,13 +124,13 @@ final class PostProcessorRegistrationDelegate {
 			 */
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			/*
-				和我们自己定义的合并
+				和自己定义的合并
 			 */
 			registryProcessors.addAll(currentRegistryProcessors);
-			/*
+			/**
 				循环调用postProcessBeanDefinitionRegistry，注意这里执行的只是currentRegistryProcessors
 				这里执行的是ConfigurationClassPostProcessor中的postProcessBeanDefinitionRegistry
-				那这个方法能做些什么呢？那就要去看这个类中的postProcessBeanDefinitionRegistry方法了
+				那这个方法能做些什么呢？那就要去看这个类中的postProcessBeanDefinitionRegistry方法了，这个类是spring中非常重要的类
 			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();

@@ -273,7 +273,7 @@ public class AnnotatedBeanDefinitionReader {
 			暂时不看
 		 */
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
-		/*
+		/**
 			重要,把当前类注册到beanDefinitionMap中
 		 */
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);

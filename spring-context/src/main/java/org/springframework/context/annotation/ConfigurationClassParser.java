@@ -286,7 +286,7 @@ class ConfigurationClassParser {
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
-				/*
+				/**
 					就是扫描加了@Component以及@Component的子注解的类放到map中 注意是BeanDefinition不是bean对象
 				 */
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
