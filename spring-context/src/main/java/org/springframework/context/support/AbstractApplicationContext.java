@@ -636,11 +636,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 */
 		beanFactory.setBeanClassLoader(getClassLoader());
 		/*
-			set一个bean表达式解析器，为了让工厂能解析bean
+			set一个bean表达式解析器，为了让工厂能解析bean 比如说${bean.name}
 		 */
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		/*
-			对象与字符串的转换
+			对象与字符串的转换 比如<property ref="bean"></property>中的ref="bean"
 		 */
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
@@ -690,7 +690,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Set a temporary ClassLoader for type matching.
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
-
+		/*
+			如果自己没有注入下面三个name的bean，spring会默认注入，都是一些环境相关的bean
+		 */
 		// Register default environment beans.
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
