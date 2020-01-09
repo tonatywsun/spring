@@ -114,6 +114,9 @@ abstract class ConfigurationClassUtils {
 			判断是不是加了@Configuration
 		 */
 		if (isFullConfigurationCandidate(metadata)) {
+			/*
+				如果加了则为beanDefinition设置configurationClass属性为full
+			 */
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		/*

@@ -1,7 +1,7 @@
 package com.yang.conf;
 
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 
 /**
@@ -9,8 +9,9 @@ import org.springframework.context.annotation.ImportResource;
  * @Author: tona.sun
  * @Date: 2019/12/24 21:01
  */
-@Configuration
+@Import(value = {/*MyImportSelector.class,*/ MyImportSelector.class})
+//@Configuration
 @ImportResource("classpath:application.xml")
-@ComponentScan(basePackages = {"com.yang"})
+@ComponentScan(basePackages = {"com.yang"}, lazyInit = false)
 public class YangAnnotationConfig {
 }

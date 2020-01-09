@@ -203,7 +203,9 @@ class ConfigurationClassParser {
 
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
 		/*
-			处理Imported,暂时不看
+			处理Imported
+			就是判断这个类是否被别人import
+			例如@Import({a.class})中的a就是Imported
 		 */
 		if (existingClass != null) {
 			if (configClass.isImported()) {
@@ -265,7 +267,7 @@ class ConfigurationClassParser {
 		/*
 			@PropertySource处理
 			@PropertySource 用于加载指定的配置文件
-			暂时没用的此注解，暂时不看
+			暂时没用到此注解，暂时不看
 		 */
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
@@ -575,8 +577,14 @@ class ConfigurationClassParser {
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
+							/*
+								执行selectImports方法
+							 */
 							String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());
 							Collection<SourceClass> importSourceClasses = asSourceClasses(importClassNames);
+							/*
+								递归
+							 */
 							processImports(configClass, currentSourceClass, importSourceClasses, false);
 						}
 					}

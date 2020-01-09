@@ -255,7 +255,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		/*
-			app提供的bean
+			app提供的bean的BeanDefinition
 		 */
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
 		/*
@@ -278,8 +278,18 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				}
 			}
 			/*
-				判断是不是加了@Configuration等注解
+				判断是不是加了@Configuration等注解  configurationClass属性设为full
 				metadata.isAnnotated(Configuration.class.getName())
+				或者
+				判断是不是加了candidateIndicators中的注解   configurationClass属性设为lite
+				candidateIndicators.add(Component.class.getName());
+				candidateIndicators.add(ComponentScan.class.getName());
+				candidateIndicators.add(Import.class.getName());
+				candidateIndicators.add(ImportResource.class.getName());
+
+				这样看来是不是加不加Configuration只要加了candidateIndicators中的注解判断只都为true主要区别是configurationClass属性值不同，后面会用
+				configurationClass是在attributes这个map中
+
 			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));

@@ -2,7 +2,6 @@ package com.yang.conf.processor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.stereotype.Component;
 
 /**
  * @Description: 注入到spring容器中我自己的BeanPostProcessor
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @Author: tona.sun
  * @Date: 2019/12/26 11:14
  */
-@Component
+//@Component
 public class MyComponentBeanPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
