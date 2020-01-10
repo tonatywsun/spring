@@ -238,7 +238,7 @@ class ConfigurationClassParser {
 		}
 		while (sourceClass != null);
 		/*
-			放到map中
+			放到map中，这里map中的key和value是一样的 是为什么呢？
 		 */
 		this.configurationClasses.put(configClass, configClass);
 	}
@@ -573,6 +573,9 @@ class ConfigurationClassParser {
 						ImportSelector selector = BeanUtils.instantiateClass(candidateClass, ImportSelector.class);
 						ParserStrategyUtils.invokeAwareMethods(
 								selector, this.environment, this.resourceLoader, this.registry);
+						/*
+							判断是否是延迟加载的ImportSelector
+						 */
 						if (selector instanceof DeferredImportSelector) {
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
@@ -596,6 +599,11 @@ class ConfigurationClassParser {
 								BeanUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class);
 						ParserStrategyUtils.invokeAwareMethods(
 								registrar, this.environment, this.resourceLoader, this.registry);
+						/*
+							放到configClass中的Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars中
+							importBeanDefinitionRegistrars.put(registrar, importingClassMetadata);放到这个map中后续处理
+							这里还没有放到beandefinetionMap中去
+						 */
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
@@ -603,6 +611,11 @@ class ConfigurationClassParser {
 						// process it as an @Configuration class
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
+						/*
+							放到的是ConfigurationClassParser中的Map<ConfigurationClass, ConfigurationClass> configurationClasses
+							configurationClasses.put(configClass, configClass);放到了这个map中后续处理
+						 	这里还没有放到beandefinetionMap中去
+						 */
 						processConfigurationClass(candidate.asConfigClass(configClass));
 					}
 				}

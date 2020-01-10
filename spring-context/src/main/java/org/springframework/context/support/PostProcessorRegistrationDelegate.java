@@ -130,12 +130,20 @@ final class PostProcessorRegistrationDelegate {
 			/**
 				循环调用postProcessBeanDefinitionRegistry，注意这里执行的只是currentRegistryProcessors
 				这里执行的是ConfigurationClassPostProcessor中的postProcessBeanDefinitionRegistry
-				那这个方法能做些什么呢？那就要去看这个类中的postProcessBeanDefinitionRegistry方法了，这个类是spring中非常重要的类
+				那这个方法能做些什么呢？那就要去看这个类中的postProcessBeanDefinitionRegistry方法了，这个类是spring中非常(最)重要的类
 			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
+			/*
+				到这里我们自己add和spring内部的BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry都执行完了，不包含注入的
+			 */
 			currentRegistryProcessors.clear();
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
+			/*
+				上面执行的是过滤出来PriorityOrdered并执行，并把name加入到processedBeans中processedBeans.add(ppName);
+				!processedBeans.contains(ppName)把上面执行过的过滤掉
+				因为PriorityOrdered extend Ordered所以这里是过滤出来属于Ordered且不属于PriorityOrdered的并执行
+			 */
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
@@ -154,6 +162,10 @@ final class PostProcessorRegistrationDelegate {
 				reiterate = false;
 				postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 				for (String ppName : postProcessorNames) {
+					/*
+						processedBeans中的已经执行过了，所以这里要过滤掉
+						这里又来了一遍 执行PriorityOrdered和Ordered之外的
+					 */
 					if (!processedBeans.contains(ppName)) {
 						currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 						processedBeans.add(ppName);
@@ -167,7 +179,13 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			/*
+				执行自己手动添加的和spring自己放入的BeanDefinitionRegistryPostProcessor的postProcessBeanFactory方法
+			 */
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+			/*
+				执行自己手动添加的BeanFactoryPostProcessor的postProcessBeanFactory方法
+			 */
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 

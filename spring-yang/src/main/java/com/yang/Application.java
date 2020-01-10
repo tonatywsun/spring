@@ -1,6 +1,9 @@
 package com.yang;
 
 import com.yang.conf.YangAnnotationConfig;
+import com.yang.entry.Config;
+import com.yang.entry.Config2;
+import com.yang.entry.User;
 import com.yang.service.OrderService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -35,5 +38,14 @@ public class Application {
 
 		OrderService orderService = applicationContext.getBean(OrderService.class);
 		orderService.getOrder(1);
+
+		User user = applicationContext.getBean(User.class);
+		//Peopel peopel = applicationContext.getBean(Peopel.class);
+		System.out.println(user);
+
+		Config config = applicationContext.getBean(Config.class);
+		Config2 config2 = applicationContext.getBean(Config2.class);
+		System.out.println(config);
+		System.out.println(config2);
 	}
 }

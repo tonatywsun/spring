@@ -16,17 +16,8 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
@@ -52,6 +43,14 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Reads a given fully-populated set of ConfigurationClass instances, registering bean
@@ -133,15 +132,30 @@ class ConfigurationClassBeanDefinitionReader {
 			this.importRegistry.removeImportingClass(configClass.getMetadata().getClassName());
 			return;
 		}
-
+		/*
+			判断当前类是否是被Imported的，spring是通过importedBy标识的
+		 */
 		if (configClass.isImported()) {
+			/*
+				注入的到beanDefinitionMap中
+			 */
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		/*
+			@Bean相关的处理，把相关信息注册到beanDefinitionMap中
+			注意:放到beanDefinitionMap中的key是方法名，如：init ，所以如果有两个相同方法名的方法都加了@bean注解后面的会把前面的覆盖
+			registerBeanDefinition(beanName, beanDefToRegister);
+			这个注册的value是个啥暂时不太了解
+		 */
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+		/*
+			import的是xml的处理 import("classpath:a.xml");
+		 */
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
