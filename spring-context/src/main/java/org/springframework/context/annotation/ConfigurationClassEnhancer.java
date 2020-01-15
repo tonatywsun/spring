@@ -94,6 +94,9 @@ class ConfigurationClassEnhancer {
 	 * @return the enhanced subclass
 	 */
 	public Class<?> enhance(Class<?> configClass, @Nullable ClassLoader classLoader) {
+		/*
+			判断是否被代理过
+		 */
 		if (EnhancedConfiguration.class.isAssignableFrom(configClass)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(String.format("Ignoring request to enhance %s as it has " +
@@ -123,11 +126,17 @@ class ConfigurationClassEnhancer {
 		 */
 		enhancer.setSuperclass(configSuperClass);
 		/*
-			添加一个代理类实现的接口
+			添加一个代理类实现的接口，这个接口继承了BeanFactoryAware其中有一个setBeanFactory(BeanFactory beanFactory)
 		 */
 		enhancer.setInterfaces(new Class<?>[] {EnhancedConfiguration.class});
 		enhancer.setUseFactory(false);
+		/*
+			名字策略
+		 */
 		enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+		/*
+			使用自定义的bean生成代理对象，如果使用cglib自带的只会生成一些简单的逻辑，无法满足需求
+		 */
 		enhancer.setStrategy(new BeanFactoryAwareGeneratorStrategy(classLoader));
 		enhancer.setCallbackFilter(CALLBACK_FILTER);
 		enhancer.setCallbackTypes(CALLBACK_FILTER.getCallbackTypes());
@@ -478,6 +487,14 @@ class ConfigurationClassEnhancer {
 		 * to happen on Groovy classes).
 		 */
 		private boolean isCurrentlyInvokedFactoryMethod(Method method) {
+			/*
+				currentlyInvoked当前正在执行的方法
+				假设有方法  A a(){b();}
+				执行到a方法时候会被拦截 a方法就是currentlyInvoked
+				currentlyInvoked =a method=a,返回true
+				接着执行到a方法中的b()时候因b()方法也是被代理的又会被拦截
+				urrentlyInvoked =a method=b 返回false
+			 */
 			Method currentlyInvoked = SimpleInstantiationStrategy.getCurrentlyInvokedFactoryMethod();
 			return (currentlyInvoked != null && method.getName().equals(currentlyInvoked.getName()) &&
 					Arrays.equals(method.getParameterTypes(), currentlyInvoked.getParameterTypes()));

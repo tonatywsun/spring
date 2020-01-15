@@ -457,7 +457,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				Class<?> configClass = beanDef.resolveBeanClass(this.beanClassLoader);
 				if (configClass != null) {
 					/*
-						cglib动态代理
+						cglib动态代理获得代理类的Class
 					 */
 					Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader);
 					if (configClass != enhancedClass) {
@@ -465,6 +465,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 							logger.trace(String.format("Replacing bean definition '%s' existing class '%s' with " +
 									"enhanced class '%s'", entry.getKey(), configClass.getName(), enhancedClass.getName()));
 						}
+						/*
+							这个方法的作用就是覆盖BeanDefinition中的BeanClass的类型，由原来的类型设置为cglib代理类的类型
+						 */
 						beanDef.setBeanClass(enhancedClass);
 					}
 				}

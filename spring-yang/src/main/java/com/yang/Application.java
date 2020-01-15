@@ -38,7 +38,7 @@ public class Application {
 
 		OrderService orderService = applicationContext.getBean(OrderService.class);
 		orderService.getOrder(1);
-
+		//java -classpath "D:\Java\jdk1.8.0_241\lib\sa-jdi.jar" sun.jvm.hotspot.HSDB
 		User user = applicationContext.getBean(User.class);
 		//Peopel peopel = applicationContext.getBean(Peopel.class);
 		System.out.println(user);
@@ -47,5 +47,10 @@ public class Application {
 		Config2 config2 = applicationContext.getBean(Config2.class);
 		System.out.println(config);
 		System.out.println(config2);
+		/*try {
+			System.in.read();
+		}catch (Exception e){
+
+		}*/
 	}
 }
