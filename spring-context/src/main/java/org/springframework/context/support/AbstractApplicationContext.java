@@ -724,7 +724,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		/*
 			 getBeanFactoryPostProcessors()拿到环境中的List<BeanFactoryPostProcessor> beanFactoryPostProcessors
 			 这里面放着自己写的BeanFactoryPostProcessors且自己手动applicationContext.addBeanFactoryPostProcessor(beanFactoryPostProcessor);加进去的
-			 加注解注进去的这里拿不到
+			 注解注进去的这里拿不到
 		 */
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 

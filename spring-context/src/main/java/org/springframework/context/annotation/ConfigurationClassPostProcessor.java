@@ -268,9 +268,6 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				内部beanDefinitionMap.get(beanName)拿出BeanDefinition
 			 */
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
-			/*
-				判断有没有被执行过
-			 */
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef) ||
 					ConfigurationClassUtils.isLiteConfigurationClass(beanDef)) {
 				if (logger.isDebugEnabled()) {
@@ -289,7 +286,6 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 				这样看来是不是加不加Configuration只要加了candidateIndicators中的注解判断只都为true主要区别是configurationClass属性值不同，后面会用
 				configurationClass是在attributes这个map中
-
 			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));

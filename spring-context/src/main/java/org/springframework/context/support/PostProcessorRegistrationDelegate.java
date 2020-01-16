@@ -53,11 +53,9 @@ final class PostProcessorRegistrationDelegate {
 			/*
 				BeanFactoryPostProcessor集合
 				regularPostProcessors和registryProcessors都是getBeanFactoryPostProcessors()拿到环境中我们自己添加的
+				这两个集合是把子类和父类区分开
 			 */
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
-			/*
-				BeanDefinitionRegistryPostProcessor集合
-			 */
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
@@ -72,6 +70,7 @@ final class PostProcessorRegistrationDelegate {
 						先执行的是自己手动添加的
 						BeanDefinitionRegistryPostProcessor比起父类BeanFactoryPostProcessor多了一个postProcessBeanDefinitionRegistry方法就是在此执行的
 						DefaultListableBeanFactory实现了BeanDefinitionRegistry所以这里传过去的BeanDefinitionRegistry registry其实就是DefaultListableBeanFactory
+
 						此处是一个扩展点
 					 */
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
@@ -97,7 +96,9 @@ final class PostProcessorRegistrationDelegate {
 				通过Class<?> type拿到beanFactory中的Map<String, BeanDefinition> beanDefinitionMap中的key
 				初始化reade时放进去的beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
 
-				当初为什么放进去呢？就是为了在这里得到拿出来使用
+				这里拿出来的是BeanDefinitionRegistryPostProcessor，初始化的时候放进去的只有一个就是ConfigurationClassPostProcessor
+
+				当初放进去，这里就拿出来使用了
 			 */
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
@@ -110,7 +111,7 @@ final class PostProcessorRegistrationDelegate {
 					/*
 						beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class)
 						beanFactory中拿到对象放到currentRegistryProcessors中，
-						beanFactory的map中只有BeanDefinition没有bean对象，所以这里
+						beanFactory的map中只有BeanDefinition没有bean对象，所以这里getBean
 						实际是通过Constructor<T> ctor中ctor.newInstance(null)获取到的对象
 					 */
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
@@ -134,7 +135,7 @@ final class PostProcessorRegistrationDelegate {
 			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			/*
-				到这里我们自己add和spring内部的BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry都执行完了，不包含注入的
+				到这里我们自己add和spring内部的BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry就执行完了，不包含注入的
 			 */
 			currentRegistryProcessors.clear();
 
@@ -179,8 +180,12 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
-			/*
+			/**
 				执行自己手动添加的和spring自己放入的BeanDefinitionRegistryPostProcessor的postProcessBeanFactory方法
+				这里也是一个扩展点
+
+				ConfigurationClassPostProcessor的postProcessBeanFactory方法也会在这里执行，这里面也比较重要，这个方法主要是
+			 	将BeanDefinitionMap中加了@Configuration注解的类的BeanDefinition中的beanClass替换为cglib代理的类
 			 */
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			/*

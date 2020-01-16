@@ -574,7 +574,7 @@ class ConfigurationClassParser {
 						ParserStrategyUtils.invokeAwareMethods(
 								selector, this.environment, this.resourceLoader, this.registry);
 						/*
-							判断是否是延迟加载的ImportSelector
+							判断是否是延迟加载的ImportSelector,如果是的话就是延迟加载相关的逻辑
 						 */
 						if (selector instanceof DeferredImportSelector) {
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);

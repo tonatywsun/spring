@@ -22,9 +22,6 @@ public class Application {
 		BeanDefinitionRegistryPostProcessor beanDefinitionRegistryPostProcessor = new MyAddBeanFactoryPostProcessorBeanDefinitionRegistryPostProcessor();
 		applicationContext.addBeanFactoryPostProcessor(beanDefinitionRegistryPostProcessor);
 		applicationContext.scan("com.yang");*/
-		/*
-			执行完refresh只是把所有的BeanDefinition对象放到了beanDefinitionMap中
-		 */
 		applicationContext.refresh();
 		/*UserService userService = (UserService) applicationContext.getBean("userService");
 		UserService userService1 = (UserService) applicationContext.getBean("userService");

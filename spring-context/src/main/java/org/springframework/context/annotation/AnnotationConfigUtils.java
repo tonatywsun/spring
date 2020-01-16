@@ -179,6 +179,7 @@ public abstract class AnnotationConfigUtils {
 			/**
 				registerPostProcessor中调用registry.registerBeanDefinition(beanName, definition);
 				将CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME、def放到beanDefinitionMap中
+			 	这个def就是非常重要的ConfigurationClassPostProcessor
 			 */
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
