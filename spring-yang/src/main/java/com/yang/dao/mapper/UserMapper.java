@@ -10,7 +10,7 @@ import com.yang.entry.User;
  */
 public interface UserMapper {
 	/**
-		随便写一个sql，用来测试获取
+	 * 随便写一个sql，用来测试获取
 	 */
 	@MySelect("select * from table where user_id = #{userId}")
 	User selectById(Integer userId);

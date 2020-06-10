@@ -14,6 +14,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @Description: TODO
@@ -22,7 +24,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
  */
 //@Component
 public class MyInitializingBean extends InstantiationAwareBeanPostProcessorAdapter implements InitializingBean,
-		BeanPostProcessor, BeanFactoryPostProcessor, BeanDefinitionRegistryPostProcessor, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
+		BeanPostProcessor, BeanFactoryPostProcessor, BeanDefinitionRegistryPostProcessor, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware, ApplicationContextAware {
 	@Autowired
 	private UserService userService;
 
@@ -33,9 +35,11 @@ public class MyInitializingBean extends InstantiationAwareBeanPostProcessorAdapt
 	public void init() {
 		System.out.println("MyInitializingBean init userService:" + userService);
 	}
+
 	public void destory() {
 		System.out.println("MyInitializingBean destory userService:" + userService);
 	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		System.out.println("MyInitializingBean afterPropertiesSet userService:" + userService);
@@ -48,45 +52,51 @@ public class MyInitializingBean extends InstantiationAwareBeanPostProcessorAdapt
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-		System.out.println("MyInitializingBean postProcessBeforeInstantiation userService:"+userService);
+		System.out.println("MyInitializingBean postProcessBeforeInstantiation userService:" + userService);
 		return super.postProcessBeforeInstantiation(beanClass, beanName);
 	}
 
 	@Override
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
-		System.out.println("MyInitializingBean postProcessAfterInstantiation userService:"+userService);
+		System.out.println("MyInitializingBean postProcessAfterInstantiation userService:" + userService);
 		return super.postProcessAfterInstantiation(bean, beanName);
 	}
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("MyInitializingBean postProcessBeforeInitialization userService:"+userService);
+		System.out.println("MyInitializingBean postProcessBeforeInitialization userService:" + userService);
 		return super.postProcessBeforeInitialization(bean, beanName);
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("MyInitializingBean postProcessAfterInstantiation userService:"+userService);
+		System.out.println("MyInitializingBean postProcessAfterInstantiation userService:" + userService);
 		return super.postProcessAfterInitialization(bean, beanName);
 	}
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		System.out.println("MyInitializingBean postProcessBeanDefinitionRegistry userService:"+userService);
+		System.out.println("MyInitializingBean postProcessBeanDefinitionRegistry userService:" + userService);
 	}
 
 	@Override
 	public void setBeanName(String name) {
-		System.out.println("MyInitializingBean setBeanName userService:"+userService);
+		System.out.println("MyInitializingBean setBeanName userService:" + userService);
 	}
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		System.out.println("MyInitializingBean setBeanFactory userService:"+userService);
+		System.out.println("MyInitializingBean setBeanFactory userService:" + userService);
 	}
 
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
-		System.out.println("MyInitializingBean setBeanClassLoader userService:"+userService);
+		System.out.println("MyInitializingBean setBeanClassLoader userService:" + userService);
 	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		System.out.println("MyInitializingBean setApplicationContext userService:" + userService);
+	}
+
 }

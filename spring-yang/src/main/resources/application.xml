@@ -6,7 +6,12 @@
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd ">
-	<bean id="userDao" class="com.yang.dao.impl.UserDaoImpl"></bean>
+	<bean id="userDao" class="com.yang.dao.impl.UserDaoImpl">
+		<property name="name" value="parent"></property>
+	</bean>
+	<bean id="userDaoChild" parent="userDao">
+		<property name="name" value="child"></property>
+	</bean>
 
-	<!--<bean id="myInitializingBean" class="com.yang.conf.MyInitializingBean" init-method="init" destroy-method="destory"></bean>-->
+	<bean id="myInitializingBean" class="com.yang.conf.MyInitializingBean" init-method="init" destroy-method="destory" ></bean>
 </beans>

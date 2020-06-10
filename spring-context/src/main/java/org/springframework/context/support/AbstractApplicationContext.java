@@ -518,15 +518,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				/*
+					注册BeanPostProcessors
+					就是加到集合中去
+					private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
+				 */
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
+				// 国际化
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				/*
+				 * 初始化事件监听多路广播器
+				 */
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 空壳方法，暂时没什么用
 				onRefresh();
 
 				// Check for listener beans and register them.
@@ -785,6 +795,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		/*
+		 * 判断容器中是否存在bdName为applicationEventMulticaster的bd
+		 * 也就是自定义的事件监听多路广播器，必须实现ApplicationEventMulticaster接口
+		 */
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
@@ -793,6 +807,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
+			/*
+			 * 如果没有，则默认采用SimpleApplicationEventMulticaster
+			 */
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isTraceEnabled()) {
@@ -898,6 +915,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		/*
+			实例化单例之前
+		 */
 		beanFactory.preInstantiateSingletons();
 	}
 

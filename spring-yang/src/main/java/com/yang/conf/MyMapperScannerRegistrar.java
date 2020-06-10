@@ -24,6 +24,7 @@ public class MyMapperScannerRegistrar implements ImportBeanDefinitionRegistrar, 
 		AbstractBeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
 		//TODO 这里beanDefinition的BeanClass类型是MyBeanFactory，但是会放进去getObject
 		beanDefinition.setBeanClass(MyBeanFactory.class);
+		beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		beanDefinition.getConstructorArgumentValues().addGenericArgumentValue("com.yang.dao.mapper.UserMapper");
 		registry.registerBeanDefinition("userMapper", beanDefinition);
 	}

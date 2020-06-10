@@ -490,6 +490,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Prepare method overrides.
+		// 处理lookup-method 和 replace-method
 		try {
 			mbdToUse.prepareMethodOverrides();
 		}
@@ -500,6 +501,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			//TODO 测试一下
+			//实现了InstantiationAwareBeanPostProcessor这个类的接口会调用postProcessBeforeInstantiation和postProcessAfterInitialization方法，如果方法返回了对象就不走之后的逻辑了
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -1142,8 +1145,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
+		//确保此时bean类已经被实际解析
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
-
+		//类的访问权限等检验
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
@@ -1153,18 +1157,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
-
+		/**
+		 * 处理xml配置中factory-method=""，会把factory-method方法对象放到容器，bean类不放到容器
+		 */
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
 		// Shortcut when re-creating the same bean...
+		//是否已经解决
 		boolean resolved = false;
+		//是否必须自动装配
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
+				//包可见字段(默认修饰符)，用于缓存已解析的构造函数或工厂方法
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
+					//包可见的字段(默认修饰符)，constructorArgumentsResolved标记构造函数参数是否为已解析
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
@@ -1179,9 +1189,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Candidate constructors for autowiring?
+		// 获取一个构造方法去创建对象
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+			//获取到了构造方法就用构造方法去创建对象
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
@@ -1190,8 +1202,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (ctors != null) {
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
-
 		// No special handling: simply use no-arg constructor.
+		// 没获取到构造方法就用默认构造方法去创建对象
 		return instantiateBean(beanName, mbd);
 	}
 
@@ -1522,8 +1534,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
 		Set<String> result = new TreeSet<>();
 		PropertyValues pvs = mbd.getPropertyValues();
+		//  获取到所有Property spring获取Property get  set  is方法
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
 		for (PropertyDescriptor pd : pds) {
+			//pd.getWriteMethod() != null 有写方法，就是有对应set方法
+			//BeanUtils.isSimpleProperty(pd.getPropertyType())是简单类型
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
 				result.add(pd.getName());
