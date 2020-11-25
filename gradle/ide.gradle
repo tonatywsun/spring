@@ -6,8 +6,8 @@ apply plugin: "propdeps-eclipse"
 apply plugin: "propdeps-idea"
 
 eclipse.jdt {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+	sourceCompatibility = 11
+	targetCompatibility = 11
 }
 
 // Replace classpath entries with project dependencies (GRADLE-1116)
